@@ -48,7 +48,11 @@ const patches = [
   },
   // File-based patches (loaded at runtime)
   { name: 'Slim TodoWrite examples (6KB → 0.4KB)', file: 'todowrite-examples' },
+  { name: 'Slim TodoWrite states section (1.8KB → 0.4KB)', file: 'todowrite-states' },
   { name: 'Slim EnterPlanMode examples (670 → 150 chars)', file: 'enterplanmode-examples' },
+  // Tool description slimming
+  { name: 'Slim Bash tool description (3.7KB → 0.6KB)', file: 'bash-tool' },
+  { name: 'Slim Task tool description (4.1KB → 0.6KB)', file: 'task-tool' },
   // Git/PR simplification
   { name: 'Simplify git commit section', file: 'git-commit' },
   { name: 'Simplify PR creation section', file: 'pr-creation' },

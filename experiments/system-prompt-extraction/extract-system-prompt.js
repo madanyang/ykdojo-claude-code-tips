@@ -420,8 +420,8 @@ sections.push(`
 const agentTypes = extractAgentTypes();
 
 const tools = [
-  { name: 'Task', search: 'Launch a new agent to handle complex', appendAgentTypes: true },
-  { name: 'Bash', search: 'Executes a given bash command in a persistent shell' },
+  { name: 'Task', search: 'Launch agents for complex, multi-step tasks', appendAgentTypes: true },
+  { name: 'Bash', search: 'Executes bash commands in a persistent shell session' },
   { name: 'Glob', search: 'Fast file pattern matching tool' },
   { name: 'Grep', search: 'A powerful search tool built on ripgrep' },
   { name: 'ExitPlanMode', search: 'Use this tool when you are in plan mode and have finished' },
