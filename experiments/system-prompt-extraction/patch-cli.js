@@ -67,7 +67,7 @@ user: Where are errors from the client handled?
 assistant: Clients are marked as failed in the \\\`connectToServer\\\` function in src/services/process.ts:712.
 </example>
 `,
-    replace: ''
+    replace: '# .\n'  // Must be non-whitespace to avoid API error
   },
 ];
 
