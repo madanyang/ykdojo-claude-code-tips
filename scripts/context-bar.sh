@@ -10,19 +10,42 @@ model=$(echo "$input" | jq -r '.model.display_name // .model.id // "?"')
 cwd=$(echo "$input" | jq -r '.cwd // empty')
 dir=$(basename "$cwd" 2>/dev/null || echo "?")
 
-# Get git branch and uncommitted file count
+# Get git branch, uncommitted file count, and sync status
 branch=""
-uncommitted=""
+git_status=""
 if [[ -n "$cwd" && -d "$cwd" ]]; then
     branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
     if [[ -n "$branch" ]]; then
+        # Count uncommitted files
         file_count=$(git -C "$cwd" --no-optional-locks status --porcelain 2>/dev/null | wc -l | tr -d ' ')
-        if [[ "$file_count" -eq 0 ]]; then
-            uncommitted="(0 files uncommitted)"
-        elif [[ "$file_count" -eq 1 ]]; then
-            uncommitted="(1 file uncommitted)"
+
+        # Check sync status with upstream
+        sync_status=""
+        upstream=$(git -C "$cwd" rev-parse --abbrev-ref @{upstream} 2>/dev/null)
+        if [[ -n "$upstream" ]]; then
+            counts=$(git -C "$cwd" rev-list --left-right --count HEAD...@{upstream} 2>/dev/null)
+            ahead=$(echo "$counts" | cut -f1)
+            behind=$(echo "$counts" | cut -f2)
+            if [[ "$ahead" -eq 0 && "$behind" -eq 0 ]]; then
+                sync_status="synced"
+            elif [[ "$ahead" -gt 0 && "$behind" -eq 0 ]]; then
+                sync_status="${ahead} ahead"
+            elif [[ "$ahead" -eq 0 && "$behind" -gt 0 ]]; then
+                sync_status="${behind} behind"
+            else
+                sync_status="${ahead} ahead, ${behind} behind"
+            fi
         else
-            uncommitted="(${file_count} files uncommitted)"
+            sync_status="no upstream"
+        fi
+
+        # Build git status string
+        if [[ "$file_count" -eq 0 ]]; then
+            git_status="(${sync_status})"
+        elif [[ "$file_count" -eq 1 ]]; then
+            git_status="(1 file uncommitted, ${sync_status})"
+        else
+            git_status="(${file_count} files uncommitted, ${sync_status})"
         fi
     fi
 fi
@@ -73,7 +96,7 @@ fi
 
 # Build output: Model | Dir | Branch (uncommitted) | Context
 output="${model} | 📁${dir}"
-[[ -n "$branch" ]] && output+=" | 🔀${branch} ${uncommitted}"
+[[ -n "$branch" ]] && output+=" | 🔀${branch} ${git_status}"
 output+=" | ${ctx}"
 
 echo "$output"
