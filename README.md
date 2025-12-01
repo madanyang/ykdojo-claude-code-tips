@@ -1,4 +1,4 @@
-# 30 Claude Code Tips: From Basics to Advanced (Work in Progress - 7 tips so far)
+# 30 Claude Code Tips: From Basics to Advanced (Work in Progress - 8 tips so far)
 
 ## Tip 0: Customize your status line
 
@@ -23,13 +23,27 @@ On my Mac, I've tried a few different options:
 
 You can get more accuracy by using a hosted service, but I found that a local model is strong enough for this purpose. Even when there are mistakes or typos in the transcription, Claude is smart enough to understand what you're trying to say. Sometimes you need to say certain things extra clearly, but overall local models work well enough.
 
-## Tip 2: AI context is like milk; it's best served fresh and condensed!
+---
+
+# Mastering Terminal Commands with Claude Code
+
+## Tip 2: Using Git and GitHub CLI like a pro
+
+Just ask Claude to handle your Git and GitHub CLI tasks. This includes committing (so you don't have to write commit messages manually), branching, pulling, and pushing.
+
+I personally allow pull automatically but not push, because push is riskier - it doesn't contaminate the origin if something goes wrong with a pull.
+
+For GitHub CLI (`gh`), there's a lot you can do. One thing I started doing more after using Claude Code is creating draft PRs. This lets Claude Code handle the PR creation process with low risk - you can review everything before marking it ready for review.
+
+---
+
+## Tip 3: AI context is like milk; it's best served fresh and condensed!
 
 When you start a new conversation with Claude Code, it performs the best because it doesn't have all the added complexity of having to process the previous context from earlier parts of the conversation. But as you talk to it longer and longer, the context gets longer and the performance tends to go down.
 
 So it's best to start a new conversation for every new topic, or if the performance starts to go down.
 
-## Tip 3: Getting output out of your terminal
+## Tip 4: Getting output out of your terminal
 
 Sometimes you want to copy and paste Claude Code's output, but copying directly from the terminal isn't always clean. Here are a few ways to get content out more easily:
 
@@ -39,7 +53,7 @@ Sometimes you want to copy and paste Claude Code's output, but copying directly 
 
 Of course, you can run these commands yourself, but if you find yourself doing it repetitively, it's helpful to let Claude run them for you.
 
-## Tip 4: Set up terminal aliases for quick access
+## Tip 5: Set up terminal aliases for quick access
 
 Since I use the terminal more because of Claude Code, I found it helpful to set up short aliases so I can launch things quickly. Here are the ones I use:
 
@@ -55,7 +69,7 @@ alias gb='github'
 alias co='code'
 ```
 
-## Tip 5: Proactively compact your context
+## Tip 6: Proactively compact your context
 
 There's a `/compact` command in Claude Code that summarizes your conversation to free up context space. Automatic compaction also happens when the full available context is filled. The total available context window for Opus 4.5 is currently 200k, and 45k of that is reserved for automatic compaction. About 10% of the total 200k is automatically filled with the system prompt, tools, memory, and dynamic context. But I found that it's better to proactively do it and manually tune it. I turned off auto-compact with `/config` so I have more context available for the main conversation and more control over when and how compaction happens.
 
@@ -90,7 +104,7 @@ Then start a fresh conversation. For the fresh agent, you can just give the path
 
 In subsequent conversations, you can ask the agent to update the document for the next agent.
 
-## Tip 6: Complete the write-test cycle for autonomous tasks
+## Tip 7: Complete the write-test cycle for autonomous tasks
 
 If you want Claude Code to run something autonomously, like `git bisect`, you need to give it a way to verify results. The key is completing the write-test cycle: write code, run it, check the output, and repeat.
 
