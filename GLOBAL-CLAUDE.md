@@ -1,53 +1,29 @@
-# Global Claude Instructions
-
-## Safety Guidelines
+# Safety
 
 **NEVER use `--dangerously-skip-permissions` on the host machine.**
 
-For risky operations, use one of the available Docker containers instead. Inside containers, YOLO mode and `--dangerously-skip-permissions` are acceptable.
+For risky operations, use a Docker container. Inside containers, YOLO mode and `--dangerously-skip-permissions` are fine.
 
-## Available Containers
+## Containers
 
-| Container | Purpose | Status |
-|-----------|---------|--------|
-| `peaceful_lovelace` | Main container for general risky operations | Primary |
-| `eager_moser` | Secondary container | Backup |
-| `daphne` | Daft-related operations (our little assistant for anything Daft) | Specialized |
-| `claude-history` | Specific purpose - do not use for general tasks | Reserved |
+| Container | Purpose |
+|-----------|---------|
+| `peaceful_lovelace` | Main container for risky operations |
+| `eager_moser` | Secondary/backup |
+| `daphne` | Daft-related operations |
+| `claude-history` | Reserved - don't use for general tasks |
 
-### Usage Examples
-
-Execute commands in a container:
 ```bash
 docker exec peaceful_lovelace <command>
+docker exec -it peaceful_lovelace bash  # interactive
 ```
 
-For interactive sessions:
-```bash
-docker exec -it peaceful_lovelace bash
-```
+## Tmux
 
-### When to Use Containers
-
-- Opening or fetching unknown URLs
-- Running untrusted scripts
-- Operations that require elevated permissions
-- Testing potentially risky code
-- Any operation you wouldn't want to run directly on the host
-
-## Tmux for Interactive Tools
-
-When asked to run things in tmux (for interactive Gemini or Claude Code sessions):
+For interactive Gemini or Claude Code sessions:
 
 ```bash
-# Create a new tmux session
-tmux new-session -d -s <session-name> '<command>'
-
-# Send commands to the session (DON'T FORGET TO PRESS ENTER)
-tmux send-keys -t <session-name> '<input>' Enter
-
-# Capture output
-tmux capture-pane -t <session-name> -p
+tmux new-session -d -s <name> '<command>'
+tmux send-keys -t <name> '<input>' Enter  # don't forget Enter!
+tmux capture-pane -t <name> -p
 ```
-
-**Common mistake: Don't forget to include `Enter` at the end of `tmux send-keys`!**
