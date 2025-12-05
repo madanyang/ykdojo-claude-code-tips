@@ -346,9 +346,9 @@ These are somewhat similar features and I initially found them pretty confusing.
 
 **CLAUDE.md** is the simplest one. It's a bunch of files that get treated as the default prompt, loaded into the beginning of every conversation no matter what. The nice thing about it is the simplicity. You can explain what the project is about in a particular project (`./CLAUDE.md`) or globally (`~/.claude/CLAUDE.md`).
 
-**Skills** are like better-structured CLAUDE.md files. They're only invoked when Claude decides they need to be invoked. For example, you could have a skill that opens a Google Translate link with proper formatting when you ask how to pronounce a word in a certain language. If those instructions are in a skill, they only load when you ask a relevant question. If they were in CLAUDE.md, they'd already be there taking up space. So skills are more token-efficient in theory.
+**Skills** are like better-structured CLAUDE.md files. They can be invoked by Claude automatically when relevant, or manually by the user with a slash (e.g., `/my-skill`). For example, you could have a skill that opens a Google Translate link with proper formatting when you ask how to pronounce a word in a certain language. If those instructions are in a skill, they only load when needed. If they were in CLAUDE.md, they'd already be there taking up space. So skills are more token-efficient in theory.
 
-**Slash Commands** are similar to skills in that they're ways of packaging instructions separately. The difference is they're invoked manually. If you need something more precise, to invoke at the right time at your own pace, slash commands are the tool to use.
+**Slash Commands** are similar to skills in that they're ways of packaging instructions separately. They can be invoked manually by the user, or by Claude itself. If you need something more precise, to invoke at the right time at your own pace, slash commands are the tool to use.
 
 **Plugins** are a way to package skills, slash commands, agents, hooks, and MCP servers together. But a plugin doesn't have to use all of them. Anthropic's official `frontend-design` plugin is essentially just a skill and nothing else. It could be distributed as a standalone skill, but the plugin format makes it easier to install.
 
