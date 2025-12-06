@@ -1,4 +1,4 @@
-# 30 Claude Code Tips: From Basics to Advanced
+# 30+ Claude Code Tips: From Basics to Advanced
 
 Tips for getting the most out of Claude Code - includes a custom status line script, cutting the system prompt in half, using Gemini CLI as Claude Code's minion, and Claude Code running itself in a container.
 
@@ -30,7 +30,15 @@ I think the best way to think about this is like you're trying to communicate wi
 
 A common objection is "what if you're in a room with other people?" I just whisper using earphones - I personally like Apple EarPods (not AirPods). They're affordable, high quality enough, and you just whisper into them quietly. I've done it in front of other people and it works well. In offices, people talk anyway - instead of talking to coworkers, you're talking quietly to your voice transcription system. I don't think there's any problem with that.
 
-## Tip 2: Using Git and GitHub CLI like a pro
+## Tip 2: Break down large problems into smaller ones
+
+This is one of the most important concepts to master. It's exactly the same as traditional software engineering - the best software engineers already know how to do this, and it applies to Claude Code too.
+
+If you find that Claude Code isn't able to one-shot a difficult problem or coding task, ask it to break it down into multiple smaller issues. See if it can solve an individual part of that problem. If it's still too hard, see if it can solve an even smaller sub-problem. Keep going until everything is solvable.
+
+Highly related to this: your problem-solving skills and software engineering skills are still highly relevant in the world of agentic coding and Claude Code. It's able to solve a lot of problems on its own, but when you apply your general problem-solving and software engineering skills to it, it becomes a lot more powerful.
+
+## Tip 3: Using Git and GitHub CLI like a pro
 
 Just ask Claude to handle your Git and GitHub CLI tasks. This includes committing (so you don't have to write commit messages manually), branching, pulling, and pushing.
 
@@ -38,13 +46,13 @@ I personally allow pull automatically but not push, because push is riskier - it
 
 For GitHub CLI (`gh`), there's a lot you can do. One thing I started doing more after using Claude Code is creating draft PRs. This lets Claude Code handle the PR creation process with low risk - you can review everything before marking it ready for review.
 
-## Tip 3: AI context is like milk; it's best served fresh and condensed!
+## Tip 4: AI context is like milk; it's best served fresh and condensed!
 
 When you start a new conversation with Claude Code, it performs the best because it doesn't have all the added complexity of having to process the previous context from earlier parts of the conversation. But as you talk to it longer and longer, the context gets longer and the performance tends to go down.
 
 So it's best to start a new conversation for every new topic, or if the performance starts to go down.
 
-## Tip 4: Getting output out of your terminal
+## Tip 5: Getting output out of your terminal
 
 Sometimes you want to copy and paste Claude Code's output, but copying directly from the terminal isn't always clean. Here are a few ways to get content out more easily:
 
@@ -55,7 +63,7 @@ Sometimes you want to copy and paste Claude Code's output, but copying directly 
 
 Of course, you can run these commands yourself, but if you find yourself doing it repetitively, it's helpful to let Claude run them for you.
 
-## Tip 5: Set up terminal aliases for quick access
+## Tip 6: Set up terminal aliases for quick access
 
 Since I use the terminal more because of Claude Code, I found it helpful to set up short aliases so I can launch things quickly. Here are the ones I use:
 
@@ -73,7 +81,7 @@ alias co='code'
 alias q='cd ~/Desktop/projects'
 ```
 
-## Tip 6: Proactively compact your context
+## Tip 7: Proactively compact your context
 
 There's a `/compact` command in Claude Code that summarizes your conversation to free up context space. Automatic compaction also happens when the full available context is filled. The total available context window for Opus 4.5 is currently 200k, and 45k of that is reserved for automatic compaction. About 10% of the total 200k is automatically filled with the system prompt, tools, memory, and dynamic context. But I found that it's better to proactively do it and manually tune it. I turned off auto-compact with `/config` so I have more context available for the main conversation and more control over when and how compaction happens.
 
@@ -108,7 +116,7 @@ Then start a fresh conversation. For the fresh agent, you can just give the path
 
 In subsequent conversations, you can ask the agent to update the document for the next agent.
 
-## Tip 7: Complete the write-test cycle for autonomous tasks
+## Tip 8: Complete the write-test cycle for autonomous tasks
 
 If you want Claude Code to run something autonomously, like `git bisect`, you need to give it a way to verify results. The key is completing the write-test cycle: write code, run it, check the output, and repeat.
 
@@ -139,7 +147,7 @@ This is also an example of why your software engineering skills still matter. If
 
 Another example is simply writing tests. After you let Claude Code write some code, if you want to test it, you can just let it write tests for itself too. And let it run on its own and fix things if it can. Of course, it doesn't always go in the right direction and you need to supervise it sometimes, but it's able to do a surprising amount of coding tasks on its own.
 
-## Tip 8: Cmd+A and Ctrl+A are your friends
+## Tip 9: Cmd+A and Ctrl+A are your friends
 
 I've been saying this for a few years now: Cmd+A and Ctrl+A are friends in the world of AI. This applies to Claude Code too.
 
@@ -149,11 +157,11 @@ This works great for terminal output too. When I have output from Claude Code it
 
 This applies to any AI, not just Claude Code.
 
-## Tip 9: Use Gemini CLI as a fallback for blocked sites
+## Tip 10: Use Gemini CLI as a fallback for blocked sites
 
 Claude Code's WebFetch tool can't access certain sites, like Reddit. But you can work around this by creating a skill that tells Claude to use Gemini CLI as a fallback. Gemini has web access and can fetch content from sites that Claude can't reach directly.
 
-This uses the same tmux pattern from Tip 7 - start a session, send commands, capture output. The skill file goes in `~/.claude/skills/reddit-fetch/SKILL.md`. See [skills/reddit-fetch/SKILL.md](skills/reddit-fetch/SKILL.md) for the full content.
+This uses the same tmux pattern from Tip 8 - start a session, send commands, capture output. The skill file goes in `~/.claude/skills/reddit-fetch/SKILL.md`. See [skills/reddit-fetch/SKILL.md](skills/reddit-fetch/SKILL.md) for the full content.
 
 Skills are more token-efficient because Claude Code only loads them when needed. If you want something simpler, you can put a condensed version in `~/.claude/CLAUDE.md` instead, but that gets loaded into every conversation whether you need it or not.
 
@@ -161,7 +169,7 @@ I tested this by asking Claude Code to check how Claude Code skills are regarded
 
 You'll need to have Gemini CLI installed for this to work. Check out [Google's Gemini CLI repo](https://github.com/google-gemini/gemini-cli) for installation instructions.
 
-## Tip 10: Invest in your own workflow
+## Tip 11: Invest in your own workflow
 
 Personally, I've created my own voice transcription app from scratch with Swift. I created my own custom status line from scratch using Claude Code, this one with bash. And I created my own system for simplifying the system prompt in Claude Code's minified JavaScript file.
 
@@ -169,7 +177,7 @@ But you don't have to go overboard like that. Just taking care of your own CLAUD
 
 All of these are investments in the tools you use to build whatever you want to build. I think it's important to spend at least a little bit of time on that.
 
-## Tip 11: Search through your conversation history
+## Tip 12: Search through your conversation history
 
 You can ask Claude Code about your past conversations, and it'll help you find and search through them. All your conversation history is stored locally in `~/.claude/`. Project-specific conversations are in `~/.claude/projects/`, with folder names based on the project path (slashes become dashes).
 
@@ -194,7 +202,7 @@ cat ~/.claude/projects/.../conversation-id.jsonl | jq -r 'select(.type=="user") 
 
 Or just ask Claude Code directly: "What did we talk about regarding X today?" and it'll search through the history for you.
 
-## Tip 12: Multitasking with terminal tabs
+## Tip 13: Multitasking with terminal tabs
 
 When running multiple Claude Code instances, staying organized is more important than any specific technical setup like Git worktrees. I recommend focusing on at most three or four tasks at a time.
 
@@ -211,7 +219,7 @@ In this example:
 4. **Fourth tab** - Working on an engineering project
 5. **Fifth tab (current)** - Writing this very tip
 
-## Tip 13: Slim down the system prompt
+## Tip 14: Slim down the system prompt
 
 Claude Code's system prompt and tool definitions take up about 18k tokens (~9% of your 200k context) before you even start working. I created a patch system that reduces this to about 10k tokens - saving around 7,300 tokens (41% of the static overhead, ~50% of the overall overhead).
 
@@ -241,9 +249,9 @@ Check out the [system-prompt folder](system-prompt/) for the patch scripts and f
 
 **Requirements**: These patches require npm installation (`npm install -g @anthropic-ai/claude-code`). The patching works by modifying the JavaScript bundle (`cli.js`) - other installation methods may produce compiled binaries that can't be patched this way.
 
-**Important**: If you want to keep your patched system prompt, disable auto-updates by adding `export DISABLE_AUTOUPDATER=1` to `~/.zshenv` (not `~/.zshrc`). The reason for `.zshenv` is that it's sourced for ALL zsh invocations, including non-interactive shells and tmux sessions. `.zshrc` only gets sourced for interactive shells, so tmux-based workflows (like the ones in Tips 7, 9, and 19) would auto-update without `.zshenv`. You can manually update later with `npm update -g @anthropic-ai/claude-code` when you're ready to re-apply patches to a new version.
+**Important**: If you want to keep your patched system prompt, disable auto-updates by adding `export DISABLE_AUTOUPDATER=1` to `~/.zshenv` (not `~/.zshrc`). The reason for `.zshenv` is that it's sourced for ALL zsh invocations, including non-interactive shells and tmux sessions. `.zshrc` only gets sourced for interactive shells, so tmux-based workflows (like the ones in Tips 8, 10, and 20) would auto-update without `.zshenv`. You can manually update later with `npm update -g @anthropic-ai/claude-code` when you're ready to re-apply patches to a new version.
 
-## Tip 14: Git worktrees for parallel branch work
+## Tip 15: Git worktrees for parallel branch work
 
 If you're working on multiple files or multiple branches and you don't want them to get conflicted, Git worktrees are a great way to work on them at the same time. You can just ask Claude Code to create a git worktree and start working on it there - you don't have to worry about the specific syntax.
 
@@ -251,7 +259,7 @@ The basic idea is that you can work on a different branch in a different directo
 
 You can add this layer of Git worktrees on top of the cascade method I discussed in the multitasking tip.
 
-## Tip 15: Manual exponential backoff for long-running jobs
+## Tip 16: Manual exponential backoff for long-running jobs
 
 When waiting on long-running jobs like Docker builds or GitHub CI, you can ask Claude Code to do manual exponential backoff. Exponential backoff is a common technique in software engineering, but you can apply it here too. Ask Claude Code to check the status with increasing sleep intervals - one minute, then two minutes, then four minutes, and so on. It's not programmatically doing it in the traditional sense - the AI is doing it manually - but it works pretty well.
 
@@ -265,7 +273,7 @@ For example, if you have a Docker build running in the background:
 
 And it keeps going until the job completes.
 
-## Tip 16: Claude Code as a writing assistant
+## Tip 17: Claude Code as a writing assistant
 
 Claude Code is an excellent writing assistant and partner. The way I use it for writing is I first give it all the context about what I'm trying to write, and then I give it detailed instructions by speaking to it using my voice. That gives me the first draft. If it's not good enough, I try a few times.
 
@@ -277,7 +285,7 @@ So it's this sort of back-and-forth process, maybe with the terminal on the left
 
 That tends to work really well.
 
-## Tip 17: Markdown is the s**t
+## Tip 18: Markdown is the s**t
 
 Typically when people write a new document, they might use something like Google Docs or maybe Notion. But now I honestly think the most efficient way to go about it is markdown.
 
@@ -285,15 +293,15 @@ Markdown was already pretty good even before AI, but with Claude Code in particu
 
 A quick tip for this one: if you want to copy and paste markdown content into a platform that doesn't accept it easily, you can paste it into a fresh Notion file first, then copy from Notion into the other platform. Notion converts it to a format that other platforms can accept. If regular pasting doesn't work, try Command + Shift + V to paste without formatting.
 
-## Tip 18: Use Notion to preserve links when pasting
+## Tip 19: Use Notion to preserve links when pasting
 
 It turns out the reverse also works. If you have text with links from other places, let's say from Slack, you can copy it. If you paste it directly into Claude Code, it doesn't show the links. But if you put it in a Notion document first, then copy from there, you get it in markdown, which of course Claude Code can read.
 
-## Tip 19: Containers for long-running risky tasks
+## Tip 20: Containers for long-running risky tasks
 
 Regular sessions are more for methodical work where you control the permissions you give and review output more carefully. Containerized environments are great for `--dangerously-skip-permissions` sessions where you don't have to give permission for each little thing. You can just let it run on its own for a while.
 
-This is useful for research or experimentation, things that take a long time and maybe could be risky. A good example is the Reddit research workflow from Tip 9, where the reddit-fetch skill goes back and forth with Gemini CLI through tmux. Running that unsupervised is risky on your main system, but in a container, if something goes wrong, it's contained.
+This is useful for research or experimentation, things that take a long time and maybe could be risky. A good example is the Reddit research workflow from Tip 10, where the reddit-fetch skill goes back and forth with Gemini CLI through tmux. Running that unsupervised is risky on your main system, but in a container, if something goes wrong, it's contained.
 
 Another example is how I created the [system prompt patching scripts](system-prompt/) in this repo. When a new version of Claude Code comes out, I need to update the patches for the minified CLI bundle. Instead of running Claude Code with `--dangerously-skip-permissions` on my host machine (where it has access to everything), I run it in a container. Claude Code can explore the minified JavaScript, find the variable mappings, and create new patch files without me approving every little thing that way.
 
@@ -316,7 +324,7 @@ This gives you a fully autonomous "worker" Claude Code that can run experimental
 
 Beyond just Claude Code, you can run different AI CLIs in containers - Codex, Gemini CLI, or others. I tried OpenAI Codex for code review, and it works well. The point isn't that you can't run these CLIs directly on your host machine - you obviously can. The value is that Claude Code's UI/UX is smooth enough that you can just talk to it and let it handle the orchestration: spinning up different models, sending data between containers and your host. Instead of manually switching between terminals and copy-pasting, Claude Code becomes the central interface that coordinates everything.
 
-## Tip 20: The best way to get better at using Claude Code is by using it
+## Tip 21: The best way to get better at using Claude Code is by using it
 
 Recently I saw a world-class rock climber being interviewed by another rock climber. She was asked, "How do you get better at rock climbing?" She simply said, "By rock climbing."
 
@@ -324,7 +332,7 @@ That's how I feel about this too. Of course, there are supplementary things you 
 
 I like to think of it like a billion token rule instead of the 10,000 hour rule. If you want to get better at AI and truly get a good intuition about how it works, the best way is to consume a lot of tokens. And nowadays it's possible. I found that especially with Opus 4.5, it's powerful enough but affordable enough that you can run multiple sessions at the same time. You don't have to worry as much about token usage, which frees you up a lot.
 
-## Tip 21: Clone conversations to branch off
+## Tip 22: Clone conversations to branch off
 
 Sometimes you want to try a different approach from a specific point in a conversation without losing your original thread. The [clone-conversation script](scripts/clone-conversation.sh) lets you duplicate a conversation with new UUIDs so you can branch off.
 
@@ -340,7 +348,7 @@ Then just type `/clone` in any conversation and Claude will handle finding the s
 
 I've tested this extensively and the cloning works really well.
 
-## Tip 22: Use realpath to get absolute paths
+## Tip 23: Use realpath to get absolute paths
 
 When you need to tell Claude Code about files in a different folder, use `realpath` to get the full absolute path:
 
@@ -348,7 +356,7 @@ When you need to tell Claude Code about files in a different folder, use `realpa
 realpath some/relative/path
 ```
 
-## Tip 23: Understanding CLAUDE.md vs Skills vs Slash Commands vs Plugins
+## Tip 24: Understanding CLAUDE.md vs Skills vs Slash Commands vs Plugins
 
 These are somewhat similar features and I initially found them pretty confusing. I've been unpacking them and trying my best to wrap my head around them, so I wanted to share what I learned.
 
@@ -362,7 +370,7 @@ Skills and slash commands are pretty similar in the way they function. The diffe
 
 **Plugins** are a way to package skills, slash commands, agents, hooks, and MCP servers together. But a plugin doesn't have to use all of them. Anthropic's official `frontend-design` plugin is essentially just a skill and nothing else. It could be distributed as a standalone skill, but the plugin format makes it easier to install.
 
-## Tip 24: Interactive PR reviews
+## Tip 25: Interactive PR reviews
 
 Claude Code is great for PR reviews. The procedure is pretty simple: you ask it to retrieve PR information using the `gh` command, and then you can go through the review however you want.
 
@@ -370,21 +378,21 @@ You can do a general review, or go file by file, step by step. You control the p
 
 The key difference is that Claude Code acts as an interactive PR reviewer, not just a one-shot machine. Some AI tools are good at one-shot reviews (including the latest GPT models), but with Claude Code you can have a conversation.
 
-## Tip 25: Claude Code as a research tool
+## Tip 26: Claude Code as a research tool
 
 Claude Code is amazing for any sort of research. It's essentially a Google replacement or deep research replacement, but more advanced in a few different ways. Whether you're researching why certain GitHub Actions failed (which I've been doing a lot recently), doing sentiment or market analysis on Reddit, exploring your codebase, or exploring public information to find something - it's able to do that.
 
-The key is giving it the right pieces of information and instructions about how to access those pieces of information. It might be `gh` terminal command access, or the container approach (Tip 19), or Reddit through Gemini CLI (Tip 9), or private information through an MCP like Slack MCP, or the Cmd+A / Ctrl+A method (Tip 8) - whatever it is.
+The key is giving it the right pieces of information and instructions about how to access those pieces of information. It might be `gh` terminal command access, or the container approach (Tip 20), or Reddit through Gemini CLI (Tip 10), or private information through an MCP like Slack MCP, or the Cmd+A / Ctrl+A method (Tip 9) - whatever it is.
 
 In fact, I was able to save $10,000 using some research through Claude Code. I hope to be able to share this story at some point soon.
 
-## Tip 26: Mastering different ways of verifying its output
+## Tip 27: Mastering different ways of verifying its output
 
 One way to verify its output if it's code is to have it write tests and make sure the tests look good in general. That's one way, but you can of course check the code it generates as it goes, just on the Claude Code UI. Another thing is you can use a visual Git client like GitHub Desktop for example. I personally use it. It's not a perfect product, but it's good enough for checking changes quickly. And having it generate a PR as I probably mentioned earlier in this post is a great way as well. Have it create a draft PR, check the content before turning it into a real PR.
 
 Another one is letting it check itself, its own work. If it gives you some sort of output, let's say from some research, you can say "are you sure about this? Can you double check?" One of my favorite prompts is to say "double check everything, every single claim in what you produced and at the end make a table of what you were able to verify" - and that seems to work really well.
 
-## Tip 27: Claude Code as a DevOps engineer
+## Tip 28: Claude Code as a DevOps engineer
 
 I wanted to specifically create a separate tip for this because it's been really amazing for me. Whenever there are GitHub Actions CI failures, I just give it to Claude Code and say "dig into this issue, try to find the root cause." Sometimes it gives you surface level answers, but if you just keep asking - was it caused by a particular commit, a particular PR, or is it a flaky issue? - it really helps you dig into these nasty issues that are hard to dig into by hand. You would need to wade through a bunch of logs and that would be super painful to do manually, but Claude Code is able to handle a lot of that.
 
@@ -392,11 +400,11 @@ Once you identify what the particular problem was, you can just create a draft P
 
 You can sometimes combine some of these things together too. For example, if you want to edit one of your PR descriptions, instead of having it edit directly (which it might mess up), you can have it put the content into a local file first, let it edit it, and then let it copy and paste it back into the GitHub PR. That works really well. Or if you want to do that yourself, you can just ask it to open it in VS Code or give it to you via pbcopy so you can copy and paste it manually.
 
-## Tip 28: Keep CLAUDE.md simple and concise
+## Tip 29: Keep CLAUDE.md simple and concise
 
 I think it's important to keep CLAUDE.md really simple and concise. You can just start with no CLAUDE.md at all. And if you find that you keep telling Claude Code the same thing over and over again, then you can just add it to CLAUDE.md. I know there is an option to do that through the `#` symbol, but I prefer to just ask Claude Code to either add it to the project level CLAUDE.md or the global CLAUDE.md and it'll know what to edit exactly. So you can just let Claude Code edit CLAUDE.md by itself based on your instruction.
 
-## Tip 29: Claude Code as the universal interface
+## Tip 30: Claude Code as the universal interface
 
 I used to think with Claude Code, CLI is like the new IDE, and it's still true in a way. I think it's a great first place to open your project whenever you want to make quick edits and stuff like that. But depending on the severity of your project, you want to be more careful about the outputs than just staying at the vibe coding level.
 
