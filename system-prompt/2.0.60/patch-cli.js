@@ -125,13 +125,17 @@ const patches = [
   { name: 'Slim Grep offset param (135 → 35 chars)', file: 'grep-params-offset' },
   { name: 'Slim Grep multiline param (112 → 40 chars)', file: 'grep-params-multiline' },
   { name: 'Slim Grep type param (114 → 30 chars)', file: 'grep-params-type' },
-  { name: 'Slim Grep -A/-B/-C params (~300 → 90 chars)', file: 'grep-params-context' },
   // Round 7 - Remove redundant parallel calls guidance
   { name: 'Remove parallel calls from Glob (~50 tokens)', file: 'glob-parallel-calls' },
   { name: 'Remove parallel calls from Read (~50 tokens)', file: 'read-parallel-calls' },
   // Round 8 - Remove duplicate content
-  { name: 'Remove duplicate security warning (~200 tokens)', file: 'duplicate-security-warning' },
   { name: 'Slim parallel calls guidance (~100 tokens)', file: 'parallel-calls' },
+  // Round 9 - More tool description slimming
+  { name: 'Slim ExitPlanMode (~1900 → 220 chars)', file: 'exitplanmode' },
+  { name: 'Slim NotebookEdit (~510 → 100 chars)', file: 'notebookedit' },
+  { name: 'Slim AskUserQuestion (~450 → 190 chars)', file: 'askuserquestion' },
+  { name: 'Slim BashOutput (~440 → 95 chars)', file: 'bashoutput' },
+  { name: 'Slim KillShell (~260 → 35 chars)', file: 'killshell' },
 ];
 
 // Helper: compute SHA256 hash
