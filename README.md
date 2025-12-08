@@ -315,6 +315,8 @@ It turns out the reverse also works. If you have text with links from other plac
 
 ## Tip 20: Containers for long-running risky tasks
 
+> Running Claude Code with `--dangerously-skip-permissions` is the equivalent of having unprotected sex. So use a condo... I mean a container.
+
 Regular sessions are more for methodical work where you control the permissions you give and review output more carefully. Containerized environments are great for `--dangerously-skip-permissions` sessions where you don't have to give permission for each little thing. You can just let it run on its own for a while.
 
 This is useful for research or experimentation, things that take a long time and maybe could be risky. A good example is the Reddit research workflow from Tip 10, where the reddit-fetch skill goes back and forth with Gemini CLI through tmux. Running that unsupervised is risky on your main system, but in a container, if something goes wrong, it's contained.
