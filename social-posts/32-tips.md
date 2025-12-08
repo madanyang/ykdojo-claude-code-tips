@@ -443,7 +443,7 @@ It's sort of like you're exploring a giant iceberg. If you want to stay at the v
 I recently saw [this post](https://www.reddit.com/r/ClaudeAI/comments/1pgxckk/claude_cli_deleted_my_entire_home_directory_wiped/) where someone's Claude Code ran `rm -rf tests/ patches/ plan/ ~/` and wiped their home directory. It's easy to dismiss as a vibe coder mistake, but this kind of mistake could happen to anyone. So it's important to audit your approved commands from time to time. To make it easier, I built **cc-safe** - a CLI that scans your `.claude/settings.json` files for risky approved commands.
 
 It detects patterns like:
-- `sudo`, `rm -rf`, `Bash(*)`, `chmod 777`, `curl | sh`
+- `sudo`, `rm -rf`, `Bash`, `chmod 777`, `curl | sh`
 - `git reset --hard`, `npm publish`, `docker run --privileged`
 - And more - it's container-aware so `docker exec` commands are skipped
 
