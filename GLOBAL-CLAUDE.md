@@ -13,6 +13,7 @@ Run `npx cc-safe <directory>` to scan Claude Code settings for security issues.
 | `peaceful_lovelace` | Main container for risky operations |
 | `eager_moser` | Secondary/backup |
 | `daphne` | Daft-related operations |
+| `delfina` | Daft CI/GitHub Actions flaky test debugging |
 
 ```bash
 docker exec peaceful_lovelace <command>
