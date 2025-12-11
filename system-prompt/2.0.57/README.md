@@ -2,28 +2,6 @@
 
 Patches to slim Claude Code's system prompt. See [2.0.55](../2.0.55/) for measured token savings and screenshots.
 
-## System Prompt Extractions
-
-This directory contains two different extractions of the Claude Code system prompt:
-
-| File | Lines | Method | Description |
-|------|-------|--------|-------------|
-| `system-prompt-original-unpatched.md` | 833 | Programmatic | Extracted from CLI source code using `extract-system-prompt.js` |
-| `system-prompt-iterative-extraction.md` | 1309 | Model self-report | Iteratively extracted by asking Claude to document its own instructions |
-
-### Differences
-
-**Programmatic extraction** parses the minified CLI bundle to reconstruct the system prompt. It captures the exact text injected at runtime but may miss some dynamic content.
-
-**Iterative extraction** asks Claude instances to describe and document their instructions, then refine the document through multiple passes until verified complete. This method:
-- Includes full JSON schemas for all 18 tools
-- Contains more verbose examples (especially for TodoWrite)
-- Documents the AskUserQuestion tool in detail
-- Adds a summary of critical "NEVER" and "ALWAYS" rules
-- May include model interpretation/organization not in the original
-
-Both are useful references - the programmatic extraction shows the raw prompt, while the iterative extraction shows how the model understands and interprets its instructions.
-
 ## Quick Start
 
 ```bash
@@ -47,10 +25,9 @@ node extract-system-prompt.js /tmp/patched.md
 ├── backup-cli.sh                          # Creates verified backup
 ├── restore-cli.sh                         # Restores from backup
 ├── patch-cli.js                           # Applies all patches (idempotent)
-├── extract-system-prompt.js               # Extracts prompt for verification
+├── extract-system-prompt.js               # Extracts prompt from CLI source
 ├── patches/                               # Patch files (find/replace pairs)
-├── system-prompt-original-unpatched.md    # Programmatic extraction from CLI source
-└── system-prompt-iterative-extraction.md  # Model self-report extraction
+└── system-prompt-original-unpatched.md    # Extracted unpatched prompt
 ```
 
 ## Patches Applied (38 total)
