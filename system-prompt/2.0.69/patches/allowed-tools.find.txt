@@ -1,0 +1,3 @@
+function iW5(A){if(!A)return"";let Q=GXA(A);if(Q.length===0)return"";let B=uZ();return`
+You can use the following tools without requiring user approval: ${Q.map((Z)=>{let Y=B5(Z.ruleValue);if(B){let J=cY0(Y);if(J)return J}return Y}).join(", ")}
+`}
