@@ -73,7 +73,9 @@ if [[ -n "$cwd" && -d "$cwd" ]]; then
         if [[ "$file_count" -eq 0 ]]; then
             git_status="(0 files uncommitted, ${sync_status})"
         elif [[ "$file_count" -eq 1 ]]; then
-            git_status="(1 file uncommitted, ${sync_status})"
+            # Show the actual filename when only one file is uncommitted
+            single_file=$(git -C "$cwd" --no-optional-locks status --porcelain -uall 2>/dev/null | head -1 | sed 's/^...//')
+            git_status="(${single_file} uncommitted, ${sync_status})"
         else
             git_status="(${file_count} files uncommitted, ${sync_status})"
         fi
