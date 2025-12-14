@@ -6,7 +6,7 @@ A two-line status line script for Claude Code that shows model, directory, git b
 
 **Example output:**
 ```
-Opus 4.5 | 📁Daft | 🔀fix/colab-pydantic-pickle (0 files uncommitted, synced 20m ago) | █░░░░░░░░░ 12% of 200k tokens used (/context)
+Opus 4.5 | 📁Daft | 🔀fix/colab-pydantic-pickle (0 files uncommitted, synced 20m ago) | █░░░░░░░░░ 12% of 200k tokens used
 💬 Okay, and this part I don't quite understand. What is type checking and why are we using it there? from typing impor...
 ```
 
