@@ -238,6 +238,12 @@ This is also an example of why your software engineering skills still matter. If
 
 Another example is simply writing tests. After you let Claude Code write some code, if you want to test it, you can just let it write tests for itself too. And let it run on its own and fix things if it can. Of course, it doesn't always go in the right direction and you need to supervise it sometimes, but it's able to do a surprising amount of coding tasks on its own.
 
+Sometimes you need to be creative with how you complete the write-test cycle. For example, if you're building a web app, you could use Puppeteer MCP or Chrome DevTools MCP. I don't have extensive experience with either, but I've heard about them and they seem to work well for a lot of people.
+
+In my personal experience, I've had a situation where I was working on a Python library at [Daft](https://github.com/Eventual-Inc/Daft). I needed to test a version I built locally on Google Colab. The trouble is it's hard to build a Python library with a Rust backend on Google Colab - it doesn't seem to work that well. So I needed to actually build a wheel locally and then upload it manually so that I could run it on Google Colab. I also tried monkey patching, which worked well in the short term before I had to wait for the whole wheel to build locally.
+
+Another situation I encountered is I needed to test something on Windows but I'm not running a Windows machine. My CI tests on the same repo were failing because we had some issues with Rust on Windows, and I had no way of testing locally. So I needed to create a draft PR with all the changes, and another draft PR with the same changes plus enabling Windows CI runs on non-main branches. I instructed Claude Code to do all of that, and then I tested the CI directly in that new branch.
+
 ## Tip 9: Cmd+A and Ctrl+A are your friends
 
 I've been saying this for a few years now: Cmd+A and Ctrl+A are friends in the world of AI. This applies to Claude Code too.
