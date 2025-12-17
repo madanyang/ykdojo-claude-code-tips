@@ -24,11 +24,6 @@ Run `npx cc-safe <directory>` to scan Claude Code settings for security issues.
 | `daphne` | Daft-related operations |
 | `delfina` | Daft CI/GitHub Actions flaky test debugging |
 
-```bash
-docker exec peaceful_lovelace <command>
-docker exec -it peaceful_lovelace bash  # interactive
-```
-
 ## Tmux
 
 For interactive Gemini or Claude Code sessions:
