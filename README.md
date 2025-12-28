@@ -257,7 +257,7 @@ This might improve over time, but by default I would go with Playwright for most
 
 One tip for improving Claude's native browser integration: you can ask it to click elements using their reference IDs instead of coordinates.
 
-This is why I disable Claude's native browser integration by default and use it through the `ch` shortcut I defined in [Tip 6](#tip-6-set-up-terminal-aliases-for-quick-access). That way Playwright handles most browser tasks, and I only enable Claude's native integration when I specifically need it.
+This is why I disable Claude's native browser integration by default and use it through the `ch` shortcut I defined previously. That way Playwright handles most browser tasks, and I only enable Claude's native integration when I specifically need it.
 
 In my personal experience, I've also had a situation where I was working on a Python library at [Daft](https://github.com/Eventual-Inc/Daft) and needed to test a version I built locally on Google Colab. The trouble is it's hard to build a Python library with a Rust backend on Google Colab - it doesn't seem to work that well. So I needed to actually build a wheel locally and then upload it manually so that I could run it on Google Colab. I also tried monkey patching, which worked well in the short term before I had to wait for the whole wheel to build locally.
 
