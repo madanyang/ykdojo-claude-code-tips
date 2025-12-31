@@ -53,9 +53,9 @@ If you need to wait for a long-running job, use sleep commands with manual expon
 
 Use Python 3.12 whenever Python is needed.
 
-# Claude Code
+# Claude Code versions
 
-Use `npm view @anthropic-ai/claude-code version` to check for new Claude Code versions.
+When asked about new versions, use `npm view @anthropic-ai/claude-code version`
 
 # Claude for Chrome
 
