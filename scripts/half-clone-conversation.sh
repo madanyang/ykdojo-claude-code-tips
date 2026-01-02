@@ -241,25 +241,42 @@ half_clone_conversation() {
         project_path=$(get_project_from_conv_file "$source_file")
     fi
 
-    # Count total lines
-    local total_lines
-    total_lines=$(wc -l < "$source_file" | tr -d ' ')
-    log_info "Total messages in conversation: $total_lines"
+    # Count "clean" user messages (not tool_results - those require a preceding tool_use)
+    # A clean user message is one where we can start a conversation
+    local total_clean_user_messages
+    total_clean_user_messages=$(grep '"type":"user"' "$source_file" | grep -cv '"type":"tool_result"' || echo "0")
+    log_info "Total clean user messages in conversation: $total_clean_user_messages"
 
-    if [ "$total_lines" -lt 2 ]; then
-        log_error "Conversation has fewer than 2 messages, nothing to half-clone"
+    if [ "$total_clean_user_messages" -lt 2 ]; then
+        log_error "Conversation has fewer than 2 clean user messages, nothing to half-clone"
         exit 1
     fi
 
-    # Calculate how many to skip (first half)
-    # For 7 messages: skip 3, keep 4 (later/larger half)
-    # For 6 messages: skip 3, keep 3
-    local skip_count
-    skip_count=$((total_lines / 2))
-    local keep_count
-    keep_count=$((total_lines - skip_count))
+    # Calculate which clean user message to start from (halfway point)
+    local skip_clean_count
+    skip_clean_count=$((total_clean_user_messages / 2))
+    local keep_clean_count
+    keep_clean_count=$((total_clean_user_messages - skip_clean_count))
 
-    log_info "Skipping first $skip_count messages, keeping later $keep_count messages"
+    # Find the line number where the target clean user message starts
+    local skip_count=0
+    local clean_user_count=0
+    while IFS= read -r line; do
+        ((skip_count++)) || true
+        # Check if it's a user message that is NOT a tool_result
+        if echo "$line" | grep -q '"type":"user"' 2>/dev/null; then
+            if ! echo "$line" | grep -q '"type":"tool_result"' 2>/dev/null; then
+                ((clean_user_count++)) || true
+                if [ "$clean_user_count" -gt "$skip_clean_count" ]; then
+                    # Found the clean user message we want to start from
+                    ((skip_count--)) || true
+                    break
+                fi
+            fi
+        fi
+    done < "$source_file"
+
+    log_info "Skipping first $skip_clean_count clean user messages ($skip_count lines), keeping $keep_clean_count clean user messages"
 
     # Generate new session ID
     local new_session
@@ -355,7 +372,7 @@ half_clone_conversation() {
     echo "Original session: $source_session"
     echo "New session:      $new_session"
     echo "Project:          $project_path"
-    echo "Messages:         $keep_count of $total_lines (skipped first $skip_count)"
+    echo "Clean user msgs:  $keep_clean_count of $total_clean_user_messages (skipped first $skip_clean_count)"
     echo ""
     echo "To resume the half-cloned conversation, use:"
     echo "  claude -r"
