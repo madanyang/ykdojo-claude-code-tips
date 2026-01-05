@@ -122,9 +122,11 @@ if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
 
     if [[ "$context_length" -gt 0 ]]; then
         pct=$((context_length * 100 / max_context))
+        pct_prefix=""
     else
         # At conversation start, ~20k baseline is already loaded
         pct=$((baseline * 100 / max_context))
+        pct_prefix="~"
     fi
 
     [[ $pct -gt 100 ]] && pct=100
@@ -142,9 +144,7 @@ if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
         fi
     done
 
-    ctx="${bar} ${C_GRAY}${pct}% of ${max_k}k tokens"
-else
-    ctx="${C_ACCENT}█${C_BAR_EMPTY}░░░░░░░░░ ${C_GRAY}~10% of ${max_k}k tokens"
+    ctx="${bar} ${C_GRAY}${pct_prefix}${pct}% of ${max_k}k tokens"
 fi
 
 # Build output: Model | Dir | Branch (uncommitted) | Context
