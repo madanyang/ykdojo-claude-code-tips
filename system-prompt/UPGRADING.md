@@ -42,6 +42,10 @@ docker exec peaceful_lovelace claude --version  # verify new version
 ### Step 2: Set up the new version folder
 
 ```bash
+# IMPORTANT: Delete existing folders first! docker cp merges instead of replacing,
+# which causes stale patch files to accumulate from previous upgrade sessions.
+docker exec peaceful_lovelace rm -rf /home/claude/projects/2.X.OLD /home/claude/projects/2.X.NEW
+
 # Copy previous version's patches to container
 docker cp system-prompt/2.X.OLD peaceful_lovelace:/home/claude/projects/
 
