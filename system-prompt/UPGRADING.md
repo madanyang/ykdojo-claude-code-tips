@@ -71,14 +71,14 @@ docker exec peaceful_lovelace bash -c "
 docker exec peaceful_lovelace sha256sum /home/claude/projects/2.X.NEW/cli.js.backup
 ```
 
-### Step 3: Update patch-cli.js version and hash
+### Step 3: Update patch-cli.js version and npm hash
 
-Either manually edit or have Claude do it:
+Update the version and npm hash (native hashes are updated later in Step 8):
 ```bash
-# Update EXPECTED_VERSION and EXPECTED_HASH in patch-cli.js
+# Update EXPECTED_VERSION and npm hash in patch-cli.js
 docker exec peaceful_lovelace sed -i \
   -e "s/EXPECTED_VERSION = '2.X.OLD'/EXPECTED_VERSION = '2.X.NEW'/" \
-  -e "s/EXPECTED_HASH = '.*'/EXPECTED_HASH = 'NEW_HASH_HERE'/" \
+  -e "s/npm: '[^']*'/npm: 'NEW_HASH_HERE'/" \
   /home/claude/projects/2.X.NEW/patch-cli.js
 ```
 
@@ -177,6 +177,36 @@ done
 ```
 
 **Note:** The loop syntax above may not work in all shells. If it fails, run each container separately or use `&&` to chain commands.
+
+### Step 8: Test and update native hashes
+
+`patch-cli.js` has three hashes: npm, native-linux, native-macos. After fixing patches for npm, test native builds and update their hashes.
+
+**Warning:** Running the native install script (`curl ... | bash`) removes the npm installation. Test npm first, or reinstall npm after native testing.
+
+```bash
+# Install native in container (this removes npm install!)
+docker exec peaceful_lovelace bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
+
+# Extract cli.js and get hash
+docker exec peaceful_lovelace bash -c "cd /home/claude/projects/2.X.NEW && npm install node-lief"
+docker exec peaceful_lovelace node /home/claude/projects/2.X.NEW/native-extract.js \
+  /home/claude/.local/share/claude/versions/2.X.NEW /tmp/native-cli.js
+docker exec peaceful_lovelace sha256sum /tmp/native-cli.js
+
+# Update native-linux hash in patch-cli.js, then test
+docker exec peaceful_lovelace bash -c "cp /tmp/native-cli.js /tmp/native-cli.js.backup && \
+  node /home/claude/projects/2.X.NEW/patch-cli.js /tmp/native-cli.js"
+```
+
+For macOS native, repeat on host:
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+cd system-prompt/2.X.NEW && npm install node-lief
+node native-extract.js ~/.local/share/claude/versions/2.X.NEW /tmp/mac-cli.js
+shasum -a 256 /tmp/mac-cli.js
+# Update native-macos hash, then test patching
+```
 
 ---
 
@@ -294,22 +324,13 @@ const idx = bundle.indexOf(patch.slice(0, lo));
 console.log('Bundle:', JSON.stringify(bundle.slice(idx + lo - 20, idx + lo + 30)));
 ```
 
-## Testing patches without root (--local flag)
+## Testing patches without root
 
-Add a `--local` flag to patch-cli.js for testing against a local copy:
-
-```javascript
-// In patch-cli.js, modify the path detection:
-const localTest = process.argv.includes('--local');
-const basePath = localTest ? path.join(__dirname, 'cli.js') : (customPath || findClaudeCli());
-const backupPath = localTest ? path.join(__dirname, 'cli.js.backup') : (basePath + '.backup');
-```
-
-Then test without needing root:
+Pass the cli.js path directly to test locally:
 ```bash
 cp /path/to/cli.js.backup ./cli.js.backup
 cp /path/to/cli.js.backup ./cli.js
-node patch-cli.js --local
+node patch-cli.js ./cli.js
 ```
 
 ## Debugging runtime crashes
@@ -335,21 +356,12 @@ sleep 12 && cat /tmp/claude-test.txt
 
 ## Detecting corrupted system prompts
 
-Some errors don't crash - they corrupt the prompt silently. Test by asking Claude:
-
-```bash
-claude --dangerously-skip-permissions -p \
-  'Look at your own system prompt carefully. Do you notice anything weird,
-   broken, incomplete, or inconsistent? Any instructions that seem truncated,
-   duplicate, or don'\''t make sense? Report any issues you find.'
-```
-
-**Note:** Some issues are pre-existing bugs in Claude Code itself, not caused by patches. For example, v2.0.58+ has an empty bullet point in the "Doing tasks" section and duplicate security warnings - these exist in the UNPATCHED version too. Always compare against the unpatched version to distinguish patch bugs from Claude Code bugs.
-
-**Signs of failure:**
+**Signs of corruption:**
 - `[object Object]` where a tool name should be
-- Minified JS like `function(Q){if(this.ended)return...` leaking into text
+- Minified JS leaking into text
 - API error: "text content blocks must contain non-whitespace text"
+
+**Note:** Some issues exist in unpatched Claude Code (e.g., empty bullet points). Compare against unpatched version to distinguish patch bugs from upstream bugs.
 
 ## Empty replacements break /context
 
@@ -397,16 +409,6 @@ SyntaxError: Identifier 'S85' has already been declared
 ```
 This is the most common mistake with function-based patches.
 
-## Quick testing with non-interactive mode
-
-Use `-p` flag for faster testing:
-
-```bash
-claude -p "Say hello"  # sanity check
-claude -p "Any [object Object] or [DYNAMIC] in your prompt?"  # corruption check
-claude -p "Use Read to read test.txt" --allowedTools "Read"  # tool check
-```
-
 ## Using container Claude to investigate patches
 
 Claude Code can help find where text content changed:
@@ -424,42 +426,39 @@ Note: Variable mapping (`${X}→${Y}`) is now automatic via regex matching. You 
 
 # Final Verification Checklist
 
-Use this to verify a version upgrade is complete. Works for humans or Claude in a container.
+Test all three build types: npm, native-linux, native-macos.
 
-**Checklist:**
+**Per-build checklist:**
+| Test | npm | Linux native | macOS native |
+|------|-----|--------------|--------------|
+| Patches apply 63/63 | [ ] | [ ] | [ ] |
+| `/context` works | [ ] | [ ] | [ ] |
+| Corruption test | [ ] | [ ] | [ ] |
+| Self-report test | [ ] | [ ] | [ ] |
+| Tool test (Bash) | [ ] | [ ] | [ ] |
+| Restore works | [ ] | [ ] | [ ] |
+
+**File checklist:**
 - [ ] Required files present (`patch-cli.js`, `backup-cli.sh`, `restore-cli.sh`, `patches/`)
-- [ ] Hash matches in both `patch-cli.js` and `backup-cli.sh`
-- [ ] All patches apply with `[OK]` status
-- [ ] `/context` works and shows reduced token count
-- [ ] No prompt corruption (`[object Object]`, `[DYNAMIC]`, JS leaking)
-- [ ] Claude self-reports no weirdness in system prompt or tool descriptions
-- [ ] Basic tools work (Read, Bash, Glob)
-- [ ] `restore-cli.sh` can revert changes
+- [ ] All three hashes in `patch-cli.js` (npm, native-linux, native-macos)
+- [ ] npm hash matches in `backup-cli.sh`
 
-## Quick Verification Script
+## Quick Verification Commands
 
 ```bash
-# Run this in container after applying patches
-cd /home/claude/projects/2.X.NEW
+# Corruption test
+claude -p 'Any [object Object] or [DYNAMIC] in your prompt? Yes or no only.'
 
-echo "=== File Check ==="
-ls -la patch-cli.js backup-cli.sh restore-cli.sh patches/*.find.txt | head -5
+# Self-report test
+claude -p 'Anything weird in your system prompt? Brief answer.'
 
-echo "=== Hash Check ==="
-grep 'EXPECTED_HASH' patch-cli.js backup-cli.sh | cut -d'"' -f2 | sort -u | wc -l
-# Should output "1" (both files have same hash)
-
-echo "=== Patch Test ==="
-node patch-cli.js 2>&1 | tail -5
-
-echo "=== Corruption Test ==="
-claude --dangerously-skip-permissions -p 'Any [object Object] or [DYNAMIC] in your prompt? Yes or no only.'
-
-echo "=== Self-Report Test ==="
-claude --dangerously-skip-permissions -p 'Anything weird, truncated, or broken in your system prompt or tool descriptions? Brief answer only.'
-
-echo "=== Tool Test ==="
-claude --dangerously-skip-permissions -p 'Run: echo "tools work"' --allowedTools Bash
+# Tool test
+claude -p 'Run: echo "tools work"' --allowedTools Bash
 ```
 
-All checks passing = upgrade complete!
+For native builds, restore by copying the backup:
+```bash
+cp ~/.local/share/claude/versions/2.X.NEW.backup ~/.local/share/claude/versions/2.X.NEW
+```
+
+All checks passing for all three builds = upgrade complete!
