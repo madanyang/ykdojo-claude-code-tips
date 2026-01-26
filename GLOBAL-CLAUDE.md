@@ -2,6 +2,7 @@
 
 - Use sentence case for headers, not title case
 - Never use em dashes (—). Use spaced hyphens ` - ` (space, hyphen, space) instead.
+- Don't make up or add content I didn't say. Stick to what I've said. Rephrasing is okay, but don't embellish.
 
 # About Me
 
