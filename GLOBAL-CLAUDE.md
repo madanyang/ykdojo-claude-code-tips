@@ -1,3 +1,8 @@
+# Writing Style
+
+- Use sentence case for headers, not title case
+- Never use em dashes (—). Use spaced hyphens ` - ` (space, hyphen, space) instead.
+
 # About Me
 
 - Name: YK
