@@ -36,7 +36,7 @@ For read-only `gh` API calls on public repos, use the container: `docker exec pe
 
 ## URL Fetching
 
-For URLs you deem safe, fetch through a container:
+For URLs, fetch them through a container:
 `docker exec peaceful_lovelace curl -sL <url>`
 
 If the page requires JavaScript/interactivity, use Playwright instead.
