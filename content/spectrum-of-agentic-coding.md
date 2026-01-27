@@ -2,11 +2,11 @@
 
 After spending over a billion tokens on AI-assisted coding over the past two and a half years - ever since I created my first agentic coding tool [Kaguya](https://github.com/ykdojo/kaguya) - I've come to a realization: vibe coding and traditional software engineering are not opposites. You can enhance vibe coding by injecting your software engineering knowledge and traditional software engineering practices. With that, vibe coding becomes *agentic coding with discipline*, *agentic software engineering*, and eventually, just high-quality software engineering. In other words, vibe coding is a spectrum.
 
-![Spectrum of agentic coding](spectrum-chart.png)
+![Spectrum of agentic coding](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/content/spectrum-chart.png)
 
 ## Four levels of agentic/vibe coding
 
-![50 shades of agentic coding](50-shades-of-agentic-coding.jpeg)
+![50 shades of agentic coding](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/content/50-shades-of-agentic-coding.jpeg)
 
 ### Level 1: Vibe coding
 
@@ -72,7 +72,7 @@ The first iteration of your code might be "slop" - low-quality AI-generated code
 
 ## The real problem with "slop"
 
-![Midwit meme about AI-assisted coding](midwit-meme.png)
+![Midwit meme about AI-assisted coding](https://raw.githubusercontent.com/ykdojo/claude-code-tips/main/content/midwit-meme.png)
 
 People complain about AI-generated code being slop. But the thing is, it's only slop because they don't put enough work into it.
 
