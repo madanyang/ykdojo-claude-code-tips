@@ -905,6 +905,7 @@ This repo is also a Claude Code plugin called `dx` (developer experience). It bu
 | `/dx:clone` | Clone conversations to branch off (Tip 23) |
 | `/dx:half-clone` | Half-clone to reduce context (Tip 23) |
 | `reddit-fetch` | Fetch Reddit content via Gemini CLI (Tip 11) - auto-invoked when needed |
+| `review-claudemd` | Review conversations to improve CLAUDE.md files |
 
 **Install with two commands:**
 
@@ -913,7 +914,7 @@ claude plugin marketplace add ykdojo/claude-code-tips
 claude plugin install dx@ykdojo
 ```
 
-After installing, the commands are available as `/dx:clone`, `/dx:half-clone`, `/dx:handoff`, and `/dx:gha`. The `reddit-fetch` skill is invoked automatically when you ask about Reddit URLs. For the clone commands, see the [recommended permission](#recommended-permission-for-clone-scripts).
+After installing, the commands are available as `/dx:clone`, `/dx:half-clone`, `/dx:handoff`, and `/dx:gha`. The `reddit-fetch` skill is invoked automatically when you ask about Reddit URLs. The `review-claudemd` skill analyzes your recent conversations and suggests improvements for your CLAUDE.md files. For the clone commands, see the [recommended permission](#recommended-permission-for-clone-scripts).
 
 **Recommended companion:** [Playwright MCP](https://github.com/microsoft/playwright-mcp) for browser automation - add with `claude mcp add -s user playwright npx @playwright/mcp@latest`
 
