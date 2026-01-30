@@ -82,12 +82,16 @@ Check your rate limits:
 
 ```
  Current session
- ███████                                            14% used
- Resets 3:59pm (Asia/Tokyo)
+ █████████▌                                         19% used
+ Resets 12:59am (America/Vancouver)
 
  Current week (all models)
- █████████████                                      26% used
- Resets Jan 3, 2026, 5:59am (Asia/Tokyo)
+ █████████████████████▌                             43% used
+ Resets Feb 3 at 1:59pm (America/Vancouver)
+
+ Current week (Sonnet only)
+ ███████████████████▌                               39% used
+ Resets 8:59am (America/Vancouver)
 ```
 
 If you want to watch your usage closely, keep it open in a tab and use Tab then Shift+Tab or ← then → to refresh.
@@ -121,24 +125,24 @@ Manage MCP (Model Context Protocol) servers:
 View your usage statistics with a GitHub-style activity graph:
 
 ```
-      Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
-      ·············································▒▒▒▓▒░█
-  Mon ··············································▒█░▓░█
-      ·············································▒▒██▓░█
-  Wed ·············································░▒█▒▓░█
-      ············································░▓▒█▓▓░
-  Fri ············································░▓░█▓▓█
-      ············································▓▒░█▓▒█
+      Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec Jan
+      ··········································▒█░▓░█░▓▒▒
+  Mon ·········································▒▒██▓░█▓█░█
+      ·········································░▒█▒▓░█▒█▒█
+  Wed ········································░▓▒█▓▓░▒▓▒██
+      ········································░▓░█▓▓▓▓█░▒█
+  Fri ········································▒░░▓▒▒█▓▓▓█
+      ········································▒▒░▓░░▓▒▒░░
 
       Less ░ ▒ ▓ █ More
 
-  Favorite model: Opus 4.5        Total tokens: 12.1m
+  Favorite model: Opus 4.5        Total tokens: 17.6m
 
-  Sessions: 1.8k                  Longest session: 20h 40m 45s
-  Current streak: 44 days         Longest streak: 45 days
-  Active days: 49/51              Peak hour: 17:00-18:00
+  Sessions: 4.1k                  Longest session: 20h 40m 45s
+  Active days: 79/80              Longest streak: 75 days
+  Most active day: Jan 26         Current streak: 74 days
 
-  You've used ~145x more tokens than Brave New World
+  You've used ~24x more tokens than War and Peace
 ```
 
 ### /clear
