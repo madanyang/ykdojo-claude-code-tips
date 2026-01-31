@@ -5,3 +5,4 @@
 ## System prompt patching
 - Upgrade guide: `system-prompt/UPGRADING.md`
 - Always go through the Final Verification Checklist at the bottom of UPGRADING.md.
+- When switching/downgrading versions: check if the host already has a patched binary before trying to patch. A hash mismatch usually means it's already patched from a previous session - just use it. Only update hashes in patch-cli.js for genuinely new Anthropic releases.
