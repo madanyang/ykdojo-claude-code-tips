@@ -53,11 +53,12 @@ echo "  4. Disable auto-updates - prevents Claude Code from auto-updating (usefu
 echo "  5. Lazy-load MCP tools - only loads MCP tool definitions when needed, saves context"
 echo "  6. Read(~/.claude) permission - allows clone/half-clone commands to read conversation history"
 echo "  7. Read(//tmp/**) permission - allows reading temporary files without prompts"
+echo "  8. Disable attribution - removes Co-Authored-By from commits and attribution from PRs"
 echo ""
 
 echo -e "${YELLOW}SHELL CONFIG (~/.zshrc or ~/.bashrc):${NC}"
-echo "  8. Aliases: c=claude, ch=claude --chrome, cs=claude --dangerously-skip-permissions"
-echo "  9. Fork shortcut: --fs expands to --fork-session (e.g., claude -c --fs)"
+echo "  9. Aliases: c=claude, ch=claude --chrome, cs=claude --dangerously-skip-permissions"
+echo " 10. Fork shortcut: --fs expands to --fork-session (e.g., claude -c --fs)"
 echo ""
 
 # Get items to skip
@@ -220,11 +221,25 @@ else
 fi
 
 # ============================================
-# 8. Terminal aliases
+# 8. Disable attribution
+# ============================================
+if should_skip "8"; then
+    echo -e "${GRAY}[Skipped]${NC} Disable attribution"
+elif json_has_key '.attribution'; then
+    echo -e "${GREEN}[Already set]${NC} Disable attribution"
+else
+    tmp=$(mktemp)
+    jq '.attribution = {"commit": "", "pr": ""}' "$SETTINGS_FILE" > "$tmp"
+    mv "$tmp" "$SETTINGS_FILE"
+    echo -e "${GREEN}[Set]${NC} Disable attribution"
+fi
+
+# ============================================
+# 9. Terminal aliases
 # ============================================
 ALIASES_MARKER="# Claude Code aliases"
 
-if should_skip "8"; then
+if should_skip "9"; then
     echo -e "${GRAY}[Skipped]${NC} Terminal aliases"
 elif grep -q "$ALIASES_MARKER" "$SHELL_RC" 2>/dev/null; then
     echo -e "${GREEN}[Already configured]${NC} Terminal aliases"
@@ -240,11 +255,11 @@ EOF
 fi
 
 # ============================================
-# 9. Fork session shortcut
+# 10. Fork session shortcut
 # ============================================
 FS_MARKER="# Claude --fs shortcut"
 
-if should_skip "9"; then
+if should_skip "10"; then
     echo -e "${GRAY}[Skipped]${NC} Fork shortcut"
 elif grep -q "$FS_MARKER" "$SHELL_RC" 2>/dev/null; then
     echo -e "${GREEN}[Already configured]${NC} Fork shortcut"
@@ -301,7 +316,7 @@ echo -e "${GREEN}Setup complete!${NC}"
 echo ""
 
 # Check if shell config was modified
-if ! should_skip "8" || ! should_skip "9"; then
+if ! should_skip "9" || ! should_skip "10"; then
     if ! grep -q "$ALIASES_MARKER" "$SHELL_RC" 2>/dev/null || ! grep -q "$FS_MARKER" "$SHELL_RC" 2>/dev/null; then
         : # nothing was added
     else

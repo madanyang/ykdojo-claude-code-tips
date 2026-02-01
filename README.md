@@ -221,6 +221,21 @@ And it turns out, `gh` is pretty powerful. You can even send arbitrary GraphQL q
   ...
 ```
 
+### Disable commit/PR attribution
+
+By default, Claude Code adds a `Co-Authored-By` trailer to commits and an attribution footer to PRs. You can disable both by adding this to `~/.claude/settings.json`:
+
+```json
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}
+```
+
+Setting both to empty strings removes the attribution entirely. This replaces the older `includeCoAuthoredBy` setting, which is now deprecated.
+
 ## Tip 5: AI context is like milk; it's best served fresh and condensed!
 
 When you start a new conversation with Claude Code, it performs the best because it doesn't have all the added complexity of having to process the previous context from earlier parts of the conversation. But as you talk to it longer and longer, the context gets longer and the performance tends to go down.
@@ -967,10 +982,11 @@ SETTINGS (~/.claude/settings.json):
   5. Lazy-load MCP tools - only loads MCP tool definitions when needed, saves context
   6. Read(~/.claude) permission - allows clone/half-clone commands to read conversation history
   7. Read(//tmp/**) permission - allows reading temporary files without prompts
+  8. Disable attribution - removes Co-Authored-By from commits and attribution from PRs
 
 SHELL CONFIG (~/.zshrc or ~/.bashrc):
-  8. Aliases: c=claude, ch=claude --chrome, cs=claude --dangerously-skip-permissions
-  9. Fork shortcut: --fs expands to --fork-session (e.g., claude -c --fs)
+  9. Aliases: c=claude, ch=claude --chrome, cs=claude --dangerously-skip-permissions
+ 10. Fork shortcut: --fs expands to --fork-session (e.g., claude -c --fs)
 
 Skip any? [e.g., 1 4 7 or Enter for all]:
 ```
