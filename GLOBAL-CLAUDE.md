@@ -32,6 +32,13 @@ ps aux | grep foo | wc -l
 ls -la /some/path
 ```
 
+Also avoid complex pipes. Instead of:
+```bash
+grep "file: '" patch-cli.js | sed "s/.*file: '\([^']*\)'.*/\1/" | sort > /tmp/used.txt
+```
+
+Either run each step individually or put it in a script file and run with `bash /tmp/script.sh`.
+
 For git operations in other directories, use `cd <path> && git ...` instead of `git -C <path>`.
 
 # Safety
