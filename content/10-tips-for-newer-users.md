@@ -10,7 +10,7 @@ The terminal version is generally the most advanced one - it's where Claude Code
 
 ## 2. Installing a specific version
 
-For the terminal version, there's an npm option and a native binary option. The native binary works well, but I personally recommend installing version 2.1.19 instead of the latest, because newer versions can be buggy. You can install a specific version like this:
+For the terminal version, there's an npm option and a native binary option. The native binary works well, but I personally recommend installing version 2.1.19 instead of the latest, because newer versions can be buggy (or pick a version you like). You can install a specific version like this:
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash -s 2.1.19
