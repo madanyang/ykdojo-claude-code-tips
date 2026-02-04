@@ -29,6 +29,8 @@ The fastest way to upgrade is to have Claude Code fix the patches autonomously i
 3. **Easy recovery** - if something breaks, the container can be reset
 4. **Copy when done** - only move verified patches to the host
 
+**Container setup:** See `~/.claude/CLAUDE.md` for container configuration. Examples below use `safeclaw-upgrade`.
+
 ### For the outer Claude (or human)
 
 If you're Claude Code running on the host and helping with an upgrade, do NOT run each docker command individually with user approval. Instead:
@@ -42,8 +44,8 @@ The container Claude handles all the iteration autonomously - that's the whole p
 ### Step 1: Update Claude in container
 
 ```bash
-docker exec -u root peaceful_lovelace npm install -g @anthropic-ai/claude-code@latest
-docker exec peaceful_lovelace claude --version  # verify new version
+docker exec -u root safeclaw-upgrade npm install -g @anthropic-ai/claude-code@latest
+docker exec safeclaw-upgrade claude --version  # verify new version
 ```
 
 ### Step 2: Set up the new version folder
@@ -51,24 +53,24 @@ docker exec peaceful_lovelace claude --version  # verify new version
 ```bash
 # IMPORTANT: Delete existing folders first! docker cp merges instead of replacing,
 # which causes stale patch files to accumulate from previous upgrade sessions.
-docker exec peaceful_lovelace rm -rf /home/claude/projects/2.X.OLD /home/claude/projects/2.X.NEW
+docker exec safeclaw-upgrade rm -rf /home/sclaw/projects/2.X.OLD /home/sclaw/projects/2.X.NEW
 
 # Copy previous version's patches to container
-docker cp system-prompt/2.X.OLD peaceful_lovelace:/home/claude/projects/
+docker cp system-prompt/2.X.OLD safeclaw-upgrade:/home/sclaw/projects/
 
 # Create new version folder from previous
 # Note: chown is needed because files copied from host keep host UID
-docker exec -u root peaceful_lovelace bash -c "
-  cp -r /home/claude/projects/2.X.OLD /home/claude/projects/2.X.NEW
-  chown -R claude:claude /home/claude/projects/"
+docker exec -u root safeclaw-upgrade bash -c "
+  cp -r /home/sclaw/projects/2.X.OLD /home/sclaw/projects/2.X.NEW
+  chown -R sclaw:sclaw /home/sclaw/projects/"
 
 # Create backup of new cli.js (IMPORTANT: use the system's freshly installed cli.js)
-docker exec peaceful_lovelace bash -c "
+docker exec safeclaw-upgrade bash -c "
   cp /usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js \
-     /home/claude/projects/2.X.NEW/cli.js.backup"
+     /home/sclaw/projects/2.X.NEW/cli.js.backup"
 
 # Get the hash for patch-cli.js
-docker exec peaceful_lovelace sha256sum /home/claude/projects/2.X.NEW/cli.js.backup
+docker exec safeclaw-upgrade sha256sum /home/sclaw/projects/2.X.NEW/cli.js.backup
 ```
 
 ### Step 3: Update patch-cli.js version and npm hash
@@ -76,10 +78,10 @@ docker exec peaceful_lovelace sha256sum /home/claude/projects/2.X.NEW/cli.js.bac
 Update the version and npm hash (native hashes are updated later in Step 8):
 ```bash
 # Update EXPECTED_VERSION and npm hash in patch-cli.js
-docker exec peaceful_lovelace sed -i \
+docker exec safeclaw-upgrade sed -i \
   -e "s/EXPECTED_VERSION = '2.X.OLD'/EXPECTED_VERSION = '2.X.NEW'/" \
   -e "s/npm: '[^']*'/npm: 'NEW_HASH_HERE'/" \
-  /home/claude/projects/2.X.NEW/patch-cli.js
+  /home/sclaw/projects/2.X.NEW/patch-cli.js
 ```
 
 ### Step 4: Let Claude fix the patches
@@ -87,12 +89,12 @@ docker exec peaceful_lovelace sed -i \
 Start a Claude session in tmux (so you can monitor progress):
 
 ```bash
-docker exec peaceful_lovelace tmux new-session -d -s upgrade \
-  'cd /home/claude/projects/2.X.NEW && claude --dangerously-skip-permissions'
+docker exec safeclaw-upgrade tmux new-session -d -s upgrade \
+  'cd /home/sclaw/projects/2.X.NEW && claude --dangerously-skip-permissions'
 
 # Wait for it to start, then send the task
 sleep 4
-docker exec peaceful_lovelace tmux send-keys -t upgrade \
+docker exec safeclaw-upgrade tmux send-keys -t upgrade \
   'Read UPGRADING.md for context. Update all patches for the new version.
    The backup is cli.js.backup. Test with: node patch-cli.js cli.js
    Keep fixing until all patches apply successfully.' Enter
@@ -100,7 +102,7 @@ docker exec peaceful_lovelace tmux send-keys -t upgrade \
 
 Monitor progress:
 ```bash
-docker exec peaceful_lovelace tmux capture-pane -t upgrade -p -S -50
+docker exec safeclaw-upgrade tmux capture-pane -t upgrade -p -S -50
 ```
 
 Claude will:
@@ -115,14 +117,14 @@ Once patches work locally, apply to the actual Claude installation and **run the
 
 ```bash
 # Apply patches to real cli.js (needs root)
-docker exec -u root peaceful_lovelace node /home/claude/projects/2.X.NEW/patch-cli.js
+docker exec -u root safeclaw-upgrade node /home/sclaw/projects/2.X.NEW/patch-cli.js
 
 # Test /context works
-docker exec peaceful_lovelace tmux new-session -d -s test 'claude --dangerously-skip-permissions'
+docker exec safeclaw-upgrade tmux new-session -d -s test 'claude --dangerously-skip-permissions'
 sleep 4
-docker exec peaceful_lovelace tmux send-keys -t test '/context' Enter
+docker exec safeclaw-upgrade tmux send-keys -t test '/context' Enter
 sleep 3
-docker exec peaceful_lovelace tmux capture-pane -t test -p -S -30
+docker exec safeclaw-upgrade tmux capture-pane -t test -p -S -30
 ```
 
 **IMPORTANT:** Don't skip verification! Run all tests from the Final Verification Checklist before copying patches to host.
@@ -134,8 +136,8 @@ docker exec peaceful_lovelace tmux capture-pane -t test -p -S -30
 mkdir -p system-prompt/2.X.NEW/patches
 
 # Copy from container (exclude the large cli.js.backup)
-docker cp peaceful_lovelace:/home/claude/projects/2.X.NEW/patch-cli.js system-prompt/2.X.NEW/
-docker cp peaceful_lovelace:/home/claude/projects/2.X.NEW/patches/. system-prompt/2.X.NEW/patches/
+docker cp safeclaw-upgrade:/home/sclaw/projects/2.X.NEW/patch-cli.js system-prompt/2.X.NEW/
+docker cp safeclaw-upgrade:/home/sclaw/projects/2.X.NEW/patches/. system-prompt/2.X.NEW/patches/
 
 # Copy and update backup/restore scripts
 cp system-prompt/2.X.OLD/backup-cli.sh system-prompt/2.X.NEW/
@@ -192,17 +194,17 @@ done
 
 ```bash
 # Install native in container (this removes npm install!)
-docker exec peaceful_lovelace bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
+docker exec safeclaw-upgrade bash -c 'curl -fsSL https://claude.ai/install.sh | bash'
 
 # Extract cli.js and get hash
-docker exec peaceful_lovelace bash -c "cd /home/claude/projects/2.X.NEW && npm install node-lief"
-docker exec peaceful_lovelace node /home/claude/projects/2.X.NEW/native-extract.js \
-  /home/claude/.local/share/claude/versions/2.X.NEW /tmp/native-cli.js
-docker exec peaceful_lovelace sha256sum /tmp/native-cli.js
+docker exec safeclaw-upgrade bash -c "cd /home/sclaw/projects/2.X.NEW && npm install node-lief"
+docker exec safeclaw-upgrade node /home/sclaw/projects/2.X.NEW/native-extract.js \
+  /home/sclaw/.local/share/claude/versions/2.X.NEW /tmp/native-cli.js
+docker exec safeclaw-upgrade sha256sum /tmp/native-cli.js
 
 # Update native-linux hash in patch-cli.js, then test
-docker exec peaceful_lovelace bash -c "cp /tmp/native-cli.js /tmp/native-cli.js.backup && \
-  node /home/claude/projects/2.X.NEW/patch-cli.js /tmp/native-cli.js"
+docker exec safeclaw-upgrade bash -c "cp /tmp/native-cli.js /tmp/native-cli.js.backup && \
+  node /home/sclaw/projects/2.X.NEW/patch-cli.js /tmp/native-cli.js"
 ```
 
 For macOS native, repeat on host:
@@ -284,10 +286,10 @@ If the container has files from a previous upgrade session, the `cli.js.backup` 
 
 **Solution:** Always copy the fresh system backup to the project folder:
 ```bash
-docker exec -u root peaceful_lovelace cp \
+docker exec -u root safeclaw-upgrade cp \
   /usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js \
-  /home/claude/projects/2.X.NEW/cli.js.backup
-docker exec -u root peaceful_lovelace chown claude:claude /home/claude/projects/2.X.NEW/cli.js.backup
+  /home/sclaw/projects/2.X.NEW/cli.js.backup
+docker exec -u root safeclaw-upgrade chown sclaw:sclaw /home/sclaw/projects/2.X.NEW/cli.js.backup
 ```
 
 Then update the hash in `patch-cli.js` to match and have container Claude re-fix the patches.
