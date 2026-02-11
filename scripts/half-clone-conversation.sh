@@ -393,9 +393,12 @@ half_clone_conversation() {
 
         # Handle parentUuid
         if (first_message) {
-            # Point first parentUuid to the synthetic marker message
-            # (queue-operation messages may not have parentUuid, so keep trying)
-            if (gsub(/"parentUuid":"[a-f0-9-]*"/, "\"parentUuid\":\"" marker_uuid "\"", line) > 0) {
+            # Point first parentUuid to the synthetic marker message, but
+            # skip tool_result messages (they need a preceding tool_use
+            # which was cut). Let them become orphans in the tree.
+            if (index(line, "\"tool_result\"") > 0) {
+                # Leave parentUuid as-is (will be dangling/orphaned)
+            } else if (gsub(/"parentUuid":"[a-f0-9-]*"/, "\"parentUuid\":\"" marker_uuid "\"", line) > 0) {
                 first_message = 0
             }
         } else {
