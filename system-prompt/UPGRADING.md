@@ -275,6 +275,23 @@ Native binaries have different cli.js hashes than npm:
 
 # Troubleshooting
 
+## Native installer produces corrupted binary when other versions are present
+
+When installing a specific native version (e.g., `bash -s 2.1.32`), the installer produces a corrupted hybrid binary if other versions already exist in `~/.local/share/claude/versions/`. The resulting binary has modified system prompt text that doesn't match either the requested version or the existing one, causing most patches to fail (e.g., 2/63 instead of 63/63).
+
+**Symptoms:**
+- Hash doesn't match any known hash for that version
+- Most patches show "not found" or "regex not found"
+- Extracted cli.js has condensed prompt text mixed with original text
+
+**Solution:** Clear the versions directory before installing:
+```bash
+rm ~/.local/share/claude/versions/*
+curl -fsSL https://claude.ai/install.sh | bash -s 2.1.32
+```
+
+**Why this happens:** The install script always downloads the latest bootstrapper binary first, then runs `claude install <version>`. When other version binaries are present, the bootstrapper appears to merge or transform content from the existing binary rather than downloading a clean build of the requested version.
+
 ## Stale backup from previous session
 
 If the container has files from a previous upgrade session, the `cli.js.backup` in the project folder may have a different hash than the freshly installed system CLI. This causes patches to fail when applied to the real installation.
