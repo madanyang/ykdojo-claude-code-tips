@@ -99,6 +99,32 @@ get_project_from_conv_file() {
     echo "$project_dirname" | sed 's|^-|/|' | sed 's|-|/|g'
 }
 
+# Filter JSONL to clean user messages only.
+# Checks the FIRST "type":"..." in each line (the top-level type), so nested
+# "type":"user" inside progress/subagent data is ignored.
+# Also excludes tool_results, isMeta skill expansions, and interrupted messages.
+# Usage: filter_clean_user_msgs < file.jsonl         (output matching lines)
+#        filter_clean_user_msgs -n < file.jsonl       (with line numbers: NR:line)
+#        filter_clean_user_msgs -c < file.jsonl       (count only)
+filter_clean_user_msgs() {
+    local mode="lines"
+    if [ "${1:-}" = "-n" ]; then mode="numbered"; fi
+    if [ "${1:-}" = "-c" ]; then mode="count"; fi
+    awk -v mode="$mode" '
+        match($0, /"type":"[^"]*"/) {
+            t = substr($0, RSTART+8, RLENGTH-9)
+            if ((t == "user" || t == "queue-operation") &&
+                index($0, "\"type\":\"tool_result\"") == 0 &&
+                index($0, "\"isMeta\":true") == 0 &&
+                index($0, "Request interrupted by user") == 0) {
+                count++
+                if (mode == "numbered") print NR":"$0
+                else if (mode == "lines") print
+            }
+        }
+        END { if (mode == "count") print count+0 }'
+}
+
 # Pre-generate UUIDs for the awk script
 pre_generate_uuids() {
     local count="$1"
@@ -136,11 +162,11 @@ preview_conversation() {
     local total_lines
     total_lines=$(wc -l < "$source_file" | tr -d ' ')
     local first_user_text
-    first_user_text=$(grep -E '"type":"(user|queue-operation)"' "$source_file" | grep -v '"type":"tool_result"' | head -1 | \
+    first_user_text=$(filter_clean_user_msgs < "$source_file" | head -1 | \
         grep -oE '"(content|text)":"[^"]*"' | head -1 | \
         LC_ALL=C sed 's/"content":"//;s/"text":"//;s/"$//' | cut -c1-120 || true)
     local last_user_text
-    last_user_text=$(grep -E '"type":"(user|queue-operation)"' "$source_file" | grep -v '"type":"tool_result"' | tail -1 | \
+    last_user_text=$(filter_clean_user_msgs < "$source_file" | tail -1 | \
         grep -oE '"(content|text)":"[^"]*"' | head -1 | \
         LC_ALL=C sed 's/"content":"//;s/"text":"//;s/"$//' | cut -c1-120 || true)
 
@@ -185,7 +211,7 @@ half_clone_conversation() {
     # Count "clean" user messages (not tool_results - those require a preceding tool_use)
     # A clean user message is one where we can start a conversation
     local total_clean_user_messages
-    total_clean_user_messages=$(grep -E '"type":"(user|queue-operation)"' "$source_file" | grep -cv '"type":"tool_result"' || echo "0")
+    total_clean_user_messages=$(filter_clean_user_msgs -c < "$source_file")
     log_info "Total clean user messages in conversation: $total_clean_user_messages"
 
     if [ "$total_clean_user_messages" -lt 2 ]; then
@@ -200,9 +226,8 @@ half_clone_conversation() {
     keep_clean_count=$((total_clean_user_messages - skip_clean_count))
 
     # OPTIMIZED: Find the line number where the target clean user message starts
-    # Use grep -n to get all clean user message line numbers in one pass
     local clean_user_line_numbers
-    clean_user_line_numbers=$(grep -nE '"type":"(user|queue-operation)"' "$source_file" | grep -v '"type":"tool_result"' | cut -d: -f1)
+    clean_user_line_numbers=$(filter_clean_user_msgs -n < "$source_file" | cut -d: -f1)
 
     # Get the line number of the (skip_clean_count + 1)th clean user message
     local skip_count
@@ -232,10 +257,9 @@ half_clone_conversation() {
     local last_clone_cmd_line=0
     local last_clean_user_line=0
 
-    # Get all user message lines with line numbers (much faster than per-line grep)
-    # Filter to clean user messages (not tool_result, not isMeta)
+    # Get all clean user message lines with line numbers
     local clean_user_lines
-    clean_user_lines=$(grep -nE '"type":"(user|queue-operation)"' "$source_file" | grep -v '"type":"tool_result"' | grep -v '"isMeta":true' || true)
+    clean_user_lines=$(filter_clean_user_msgs -n < "$source_file" || true)
 
     if [ -n "$clean_user_lines" ]; then
         # Get the last clean user message line
@@ -356,6 +380,13 @@ half_clone_conversation() {
         return line
     }
 
+    function get_top_type(line) {
+        if (match(line, /"type":"[^"]*"/)) {
+            return substr(line, RSTART+8, RLENGTH-9)
+        }
+        return ""
+    }
+
     function halve_number(line, field,    pattern, num, halved) {
         pattern = "\"" field "\":[0-9]+"
         if (match(line, pattern)) {
@@ -416,11 +447,16 @@ half_clone_conversation() {
             gsub("\"messageId\":\"" old_msgid "\"", "\"messageId\":\"" new_msgid "\"", line)
         }
 
-        # Tag first user message (including queue-operation messages)
-        if (first_user && (index(line, "\"type\":\"user\"") > 0 || index(line, "\"type\":\"queue-operation\"") > 0)) {
-            gsub("\"content\":\"", "\"content\":\"" clone_tag " ", line)
-            gsub("\"text\":\"", "\"text\":\"" clone_tag " ", line)
-            first_user = 0
+        # Tag first genuine user message (check top-level type, skip isMeta/interrupted)
+        if (first_user) {
+            top_type = get_top_type(line)
+            if ((top_type == "user" || top_type == "queue-operation") &&
+                index(line, "\"isMeta\":true") == 0 &&
+                index(line, "Request interrupted by user") == 0) {
+                gsub("\"content\":\"", "\"content\":\"" clone_tag " ", line)
+                gsub("\"text\":\"", "\"text\":\"" clone_tag " ", line)
+                first_user = 0
+            }
         }
 
         # Halve token counts
@@ -460,16 +496,16 @@ half_clone_conversation() {
     # Update history.jsonl
     log_info "Updating history file..."
 
-    # Get display text from first user message in the KEPT portion
+    # Get display text from first clean user message in the KEPT portion
     local display_text
-    display_text=$(tail -n +"$((skip_count + 1))" "$source_file" | grep -E '"type":"(user|queue-operation)"' | head -1 | \
+    display_text=$(tail -n +"$((skip_count + 1))" "$source_file" | filter_clean_user_msgs | head -1 | \
         grep -oE '"content":"[^"]*"' | head -1 | \
         LC_ALL=C sed 's/"content":"//;s/"$//' | \
         head -c 200 || echo "[Half-cloned conversation]")
 
     if [ -z "$display_text" ]; then
         # Try array format
-        display_text=$(tail -n +"$((skip_count + 1))" "$source_file" | grep -E '"type":"(user|queue-operation)"' | head -1 | \
+        display_text=$(tail -n +"$((skip_count + 1))" "$source_file" | filter_clean_user_msgs | head -1 | \
             grep -oE '"text":"[^"]*"' | head -1 | \
             LC_ALL=C sed 's/"text":"//;s/"$//' | \
             head -c 200 || echo "[Half-cloned conversation]")

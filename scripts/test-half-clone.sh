@@ -108,9 +108,9 @@ get_new_session_from_output() {
 }
 
 # Test 1: 6 messages (3 user, 3 assistant) -> 3 clean user msgs, skip 1, keep 2
-# Starts at user message 2 (line 3), keeps lines 3-6 = 4 messages + 1 reference = 5
+# Output: marker(1) + kept lines 3-6(4) + reference(1) = 6
 test_even_messages() {
-    log_test "6 messages (3 clean user): should keep 4 lines + 1 reference = 5"
+    log_test "6 messages (3 clean user): should produce 1 marker + 4 kept + 1 reference = 6"
 
     local session_id
     session_id=$(create_test_conversation 6)
@@ -128,17 +128,17 @@ test_even_messages() {
 
     local count
     count=$(count_messages "$new_file")
-    if [ "$count" -eq 5 ]; then
-        log_pass "Kept 5 messages (4 + reference)"
+    if [ "$count" -eq 6 ]; then
+        log_pass "Kept 6 messages (marker + 4 kept + reference)"
     else
-        log_fail "Expected 5 messages, got $count"
+        log_fail "Expected 6 messages, got $count"
     fi
 }
 
 # Test 2: 7 messages (4 user, 3 assistant) -> 4 clean user msgs, skip 2, keep 2
-# Starts at user message 3 (line 5), keeps lines 5-7 = 3 messages + 1 reference = 4
+# Output: marker(1) + kept lines 5-7(3) + reference(1) = 5
 test_odd_messages() {
-    log_test "7 messages (4 clean user): should keep 3 lines + 1 reference = 4"
+    log_test "7 messages (4 clean user): should produce 1 marker + 3 kept + 1 reference = 5"
 
     local session_id
     session_id=$(create_test_conversation 7)
@@ -151,17 +151,17 @@ test_odd_messages() {
 
     local count
     count=$(count_messages "$new_file")
-    if [ "$count" -eq 4 ]; then
-        log_pass "Kept 4 messages (3 + reference)"
+    if [ "$count" -eq 5 ]; then
+        log_pass "Kept 5 messages (marker + 3 kept + reference)"
     else
-        log_fail "Expected 4 messages, got $count"
+        log_fail "Expected 5 messages, got $count"
     fi
 }
 
 # Test 3: 4 messages (2 user, 2 assistant) -> 2 clean user msgs, skip 1, keep 1
-# Starts at user message 2 (line 3), keeps lines 3-4 = 2 messages + 1 reference = 3
+# Output: marker(1) + kept lines 3-4(2) + reference(1) = 4
 test_minimum_messages() {
-    log_test "4 messages (2 clean user): should keep 2 lines + 1 reference = 3"
+    log_test "4 messages (2 clean user): should produce 1 marker + 2 kept + 1 reference = 4"
 
     local session_id
     session_id=$(create_test_conversation 4)
@@ -174,10 +174,10 @@ test_minimum_messages() {
 
     local count
     count=$(count_messages "$new_file")
-    if [ "$count" -eq 3 ]; then
-        log_pass "Kept 3 messages (2 + reference)"
+    if [ "$count" -eq 4 ]; then
+        log_pass "Kept 4 messages (marker + 2 kept + reference)"
     else
-        log_fail "Expected 3 messages, got $count"
+        log_fail "Expected 4 messages, got $count"
     fi
 }
 
@@ -335,19 +335,21 @@ test_double_tagging() {
     new_session=$(get_new_session_from_output "$output")
     local new_file="${TEST_PROJECTS_DIR}/${TEST_PROJECT_DIRNAME}/${new_session}.jsonl"
 
-    # Should have two [HALF-CLONE ...] tags - the new one prepended to the existing one
-    local first_user_line
-    first_user_line=$(grep '"type":"user"' "$new_file" | head -1)
+    # The first user line is the synthetic marker ("Continued from session ...").
+    # The second user line is the first KEPT message from the original, which
+    # already had a [HALF-CLONE] tag and should now have a second one prepended.
+    local kept_user_line
+    kept_user_line=$(grep '"type":"user"' "$new_file" | grep -v "Continued from session" | head -1)
 
     # Count occurrences of [HALF-CLONE pattern
     local tag_count
-    tag_count=$(echo "$first_user_line" | grep -oE '\[HALF-CLONE [A-Z][a-z]+ [0-9]+ [0-9]+:[0-9]+\]' | wc -l | tr -d ' ')
+    tag_count=$(echo "$kept_user_line" | grep -oE '\[HALF-CLONE [A-Z][a-z]+ [0-9]+ [0-9]+:[0-9]+\]' | wc -l | tr -d ' ')
 
     if [ "$tag_count" -eq 2 ]; then
         log_pass "Double tagging works - found 2 [HALF-CLONE] tags"
     else
         log_fail "Expected 2 [HALF-CLONE] tags, found $tag_count"
-        echo "First user line: $first_user_line"
+        echo "Kept user line: $kept_user_line"
     fi
 }
 
@@ -397,6 +399,57 @@ test_thinking_blocks_stripped() {
     fi
 }
 
+# Test 11: Progress messages with nested "type":"user" should NOT count as clean user messages
+test_progress_with_nested_user_type() {
+    log_test "Progress messages with nested type:user should not count as clean user messages"
+
+    local session_id
+    session_id=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    local conv_file="${TEST_PROJECTS_DIR}/${TEST_PROJECT_DIRNAME}/${session_id}.jsonl"
+
+    local uuid1 uuid2 uuid3 uuid4 uuid5 uuid6 uuid7 uuid8
+    uuid1=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid2=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid3=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid4=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid5=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid6=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid7=$(uuidgen | tr '[:upper:]' '[:lower:]')
+    uuid8=$(uuidgen | tr '[:upper:]' '[:lower:]')
+
+    # Conversation: U1, A1, progress(nested user), progress(nested user), U2, A2, U3 CORRECT, A3
+    # Real clean user messages: U1, U2, U3 = 3. Skip 1, keep 2. Start at U2.
+    # If progress counted: 5 "clean" msgs, skip 2, start at U2 (or worse, a progress line)
+    # With the fix: 3 clean msgs, skip 1, start at U2 -> first real content is U2
+    {
+        generate_message "$uuid1" "null" "$session_id" "user" "Question 1"
+        generate_message "$uuid2" "$uuid1" "$session_id" "assistant" "Answer 1"
+        # Progress messages with nested "type":"user" (simulates subagent Task progress)
+        echo "{\"type\":\"progress\",\"sessionId\":\"${session_id}\",\"data\":{\"message\":{\"type\":\"user\",\"message\":{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"subagent input\"}]}}},\"uuid\":\"${uuid3}\",\"timestamp\":\"2025-01-01T00:00:00.000Z\"}"
+        echo "{\"type\":\"progress\",\"sessionId\":\"${session_id}\",\"data\":{\"message\":{\"type\":\"user\",\"message\":{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"another subagent input\"}]}}},\"uuid\":\"${uuid4}\",\"timestamp\":\"2025-01-01T00:00:00.000Z\"}"
+        generate_message "$uuid5" "$uuid2" "$session_id" "user" "Question 2"
+        generate_message "$uuid6" "$uuid5" "$session_id" "assistant" "Answer 2"
+        generate_message "$uuid7" "$uuid6" "$session_id" "user" "Question 3 CORRECT START"
+        generate_message "$uuid8" "$uuid7" "$session_id" "assistant" "Answer 3"
+    } > "$conv_file"
+
+    local output
+    output=$(run_half_clone "$session_id")
+
+    local new_session
+    new_session=$(get_new_session_from_output "$output")
+    local new_file="${TEST_PROJECTS_DIR}/${TEST_PROJECT_DIRNAME}/${new_session}.jsonl"
+
+    # The output from the script should say "3" clean user messages
+    if echo "$output" | grep -q "Total clean user messages in conversation: 3"; then
+        log_pass "Progress messages with nested type:user correctly excluded from count (3 clean, not 5)"
+    else
+        local actual_count
+        actual_count=$(echo "$output" | grep "Total clean user messages" | grep -oE '[0-9]+')
+        log_fail "Expected 3 clean user messages, script counted $actual_count"
+    fi
+}
+
 # Main
 main() {
     echo "================================"
@@ -422,6 +475,7 @@ main() {
     test_history_entry
     test_double_tagging
     test_thinking_blocks_stripped
+    test_progress_with_nested_user_type
 
     echo ""
     echo "================================"
