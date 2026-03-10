@@ -20,6 +20,8 @@
 | jqueryscript/awesome-claude-code | 104 | PR #9 | Open | https://github.com/jqueryscript/awesome-claude-code/pull/9 |
 | alvinunreal/awesome-claude | 916 | PR #14 | Merged | https://github.com/alvinunreal/awesome-claude/pull/14 |
 | ComposioHQ/awesome-claude-skills | 26k | PR #28 | Merged | https://github.com/ComposioHQ/awesome-claude-skills/pull/28 |
+| VoltAgent/awesome-agent-skills | 10.5k | PR #197 | Open | https://github.com/VoltAgent/awesome-agent-skills/pull/197 |
+| BehiSecc/awesome-claude-skills | 7.3k | PR #109 | Open | https://github.com/BehiSecc/awesome-claude-skills/pull/109 |
 
 ## Not Submitting
 
@@ -37,6 +39,7 @@
 | dx as Tooling | hesreallyhim/awesome-claude-code (issue #424, closed) |
 | reddit-fetch skill | travisvn/awesome-claude-skills |
 | Commands (gha, handoff, clone, half-clone) | Bundled in plugin submissions |
+| review-claudemd skill | VoltAgent/awesome-agent-skills, BehiSecc/awesome-claude-skills |
 
 ## Notes
 
